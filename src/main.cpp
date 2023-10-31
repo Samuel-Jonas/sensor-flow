@@ -7,25 +7,32 @@
 #include <ArduinoJson.h>
 #include <WiFiClientSecure.h>
 #include <MQTTClient.h>
-#include <secret.h>
+#include "private/secret.h"
 
 #define AWS_IOT_PUBLISH_TOPIC "esp32/pub"
 #define AWS_IOT_SUBSCRIBE_TOPIC "esp32/sub"
 
 #define ONE_WIRE_BUS 2
-#define DHT_PIN 4
-#define DHT_TYPE DHT22
+#define DHT_SENSOR_PIN 4
+#define PH_SENSOR_PIN 32
+#define UV_SENSOR_PIN 35
+#define TDS_SENSOR_PIN 33
+#define LDR_SENSOR_PIN 34
 
-const int PH_SENSOR_PIN = 36;
-const int UV_SENSOR_PIN = 6;
-const int TDS_SENSOR_PIN = 8;
+#define DHT_TYPE DHT22
 
 WiFiClientSecure wifi_client = WiFiClientSecure();
 MQTTClient mqtt_client = MQTTClient(256);
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
-DHT dht(DHT_PIN, DHT_TYPE);
+DHT dht(DHT_SENSOR_PIN, DHT_TYPE);
+
+void incomingMessageHandler(String &topic, String &payload) {
+  Serial.println("Message received!");
+  Serial.println("Topic: " + topic);
+  Serial.println("Payload: " + payload);
+}
 
 void connectToAWS() {
   WiFi.mode(WIFI_STA);
@@ -37,7 +44,7 @@ void connectToAWS() {
     Serial.print(".");
   }
 
-  Serial.print("done!\n");
+  Serial.print(" done!\n");
 
   wifi_client.setCACert(AWS_CERT_CA);
   wifi_client.setCertificate(AWS_CERT_CRT);
@@ -99,17 +106,15 @@ void publishMessage() {
   int tdsValue = analogRead(TDS_SENSOR_PIN);
   REQUEST_BODY["EC"] = tdsValue;
 
+  // Sensor LDR verificar se está de dia ou a noite
+  int ldrValue = analogRead(LDR_SENSOR_PIN);
+  REQUEST_BODY["LDR"] = ldrValue;
+
   char payload[512];
   serializeJson(REQUEST_BODY, payload);
 
   mqtt_client.publish(AWS_IOT_PUBLISH_TOPIC, payload);
   Serial.println("Sent message");
-}
-
-void incomingMessageHandler(String &topic, String &payload) {
-  Serial.println("Message received!");
-  Serial.println("Topic: " + topic);
-  Serial.println("Payload: " + payload);
 }
 
 void setup() {
