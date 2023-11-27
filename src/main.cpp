@@ -92,20 +92,20 @@ void publishMessage() {
   char formattedTime[20];
   strftime(formattedTime, sizeof(formattedTime), "%Y-%m-%d %H:%M:%S", &timeInfo);
 
-  REQUEST_BODY["Timestamp"] = formattedTime;
+  REQUEST_BODY["time_stamp"] = formattedTime;
 
   // Sensor de temperatura da solução PIN 2
   sensors.requestTemperatures();
   float temperatureC = sensors.getTempCByIndex(0);
-  REQUEST_BODY["Temperature H2O (°C)"] = temperatureC;
+  REQUEST_BODY["solution_temperature"] = temperatureC;
 
   // Sensor de temperatura do ambiente PIN 4
   float temperature = dht.readTemperature();
-  REQUEST_BODY["Temperature Zone (°C)"] = temperature;
+  REQUEST_BODY["zone_temperature"] = temperature;
 
   // Sensor de temperatura do ambiente PIN 4
   float humidity = dht.readHumidity();
-  REQUEST_BODY["Humidity (%)"] = humidity;
+  REQUEST_BODY["humidity"] = humidity;
 
   // Sensor de pH PIN indefinido
   int rawValue = analogRead(PH_SENSOR_PIN);
@@ -113,20 +113,20 @@ void publishMessage() {
   // Convert the analog value to pH using your sensor's calibration data.
   // You'll need to calibrate your sensor to get accurate pH values.
   float pHValue = map(rawValue, 0, 4095, 0, 14);
-  REQUEST_BODY["pH Level"] = pHValue;
+  REQUEST_BODY["ph_level"] = pHValue;
 
   // Sensor raios ultravioleta PIN indefinido
   int uvValue = analogRead(UV_SENSOR_PIN);
   float uvIntensity = uvValue / 1024.0 * 5.0;
-  REQUEST_BODY["Ultraviolet Light"] = uvIntensity;
+  REQUEST_BODY["uv_light"] = uvIntensity;
 
   // Sensor de condutividade elétrica
   int tdsValue = analogRead(TDS_SENSOR_PIN);
-  REQUEST_BODY["Electrical Conductivity"] = tdsValue;
+  REQUEST_BODY["electrical_conductivity"] = tdsValue;
 
   // Sensor LDR verificar se está de dia ou a noite
   int ldrValue = analogRead(LDR_SENSOR_PIN);
-  REQUEST_BODY["Bright Level"] = ldrValue;
+  REQUEST_BODY["bright_level"] = ldrValue;
 
   char payload[512];
   serializeJson(REQUEST_BODY, payload);
@@ -146,20 +146,20 @@ void logInfo() {
   char formattedTime[20];
   strftime(formattedTime, sizeof(formattedTime), "%Y-%m-%d %H:%M:%S", &timeInfo);
 
-  REQUEST_BODY["Timestamp"] = formattedTime;
+  REQUEST_BODY["time_stamp"] = formattedTime;
 
   // Sensor de temperatura da solução PIN 2
   sensors.requestTemperatures();
   float temperatureC = sensors.getTempCByIndex(0);
-  REQUEST_BODY["Temperature H2O (°C)"] = temperatureC;
+  REQUEST_BODY["solution_temperature"] = temperatureC;
 
   // Sensor de temperatura do ambiente PIN 4
   float temperature = dht.readTemperature();
-  REQUEST_BODY["Temperature Zone (°C)"] = temperature;
+  REQUEST_BODY["zone_temperature"] = temperature;
 
   // Sensor de temperatura do ambiente PIN 4
   float humidity = dht.readHumidity();
-  REQUEST_BODY["Humidity (%)"] = humidity;
+  REQUEST_BODY["humidity"] = humidity;
 
   // Sensor de pH PIN indefinido
   int rawValue = analogRead(PH_SENSOR_PIN);
@@ -167,20 +167,20 @@ void logInfo() {
   // Convert the analog value to pH using your sensor's calibration data.
   // You'll need to calibrate your sensor to get accurate pH values.
   float pHValue = map(rawValue, 0, 4095, 0, 14);
-  REQUEST_BODY["pH Level"] = pHValue;
+  REQUEST_BODY["ph_level"] = pHValue;
 
   // Sensor raios ultravioleta PIN indefinido
   int uvValue = analogRead(UV_SENSOR_PIN);
   float uvIntensity = uvValue / 1024.0 * 5.0;
-  REQUEST_BODY["Ultraviolet Light"] = uvIntensity;
+  REQUEST_BODY["uv_light"] = uvIntensity;
 
   // Sensor de condutividade elétrica
   int tdsValue = analogRead(TDS_SENSOR_PIN);
-  REQUEST_BODY["Electrical Conductivity"] = tdsValue;
+  REQUEST_BODY["electrical_conductivity"] = tdsValue;
 
   // Sensor LDR verificar se está de dia ou a noite
   int ldrValue = analogRead(LDR_SENSOR_PIN);
-  REQUEST_BODY["Bright Level"] = ldrValue;
+  REQUEST_BODY["bright_level"] = ldrValue;
 
   char payload[512];
   serializeJson(REQUEST_BODY, payload);
@@ -200,5 +200,5 @@ void loop() {
   publishMessage();
   mqtt_client.loop();
   //logInfo();
-  delay(1500);
+  delay(30*60*1000);
 }
